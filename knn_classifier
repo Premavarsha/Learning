@@ -1,0 +1,82 @@
+# GRIP - THE SPARKS FOUNDATION
+
+# Task :- Prediction using Unsupervised Machine Learning
+
+For the given ‘Iris’ dataset, to predict the optimum number of clusters and represent it visually with Python.
+
+By Premavarsha V
+
+# Import Modules
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline 
+import seaborn as sns
+from sklearn.model_selection import train_test_split,GridSearchCV, StratifiedKFold
+from sklearn.neighbors import KNeighborsClassifier
+
+# Loading the dataset
+
+iris=pd.read_csv("E:/prema varsha/GRIP/task2/Iris.csv")
+
+iris.shape
+
+iris.head()
+
+iris=iris.drop(columns=['Id'])
+iris.head()
+
+#To display stats about data
+iris.describe()
+
+iris.info()
+
+iris['Species'].value_counts()
+
+# Preprocessing the dataset
+
+#Check for null values
+iris.isnull().sum()
+
+# Visualization
+
+# # Scatter plot
+
+sns.FacetGrid(iris, hue="Species", height=5).map(plt.scatter, "SepalLengthCm", "SepalWidthCm").add_legend();
+sns.FacetGrid(iris, hue="Species", height=5).map(plt.scatter, "PetalLengthCm", "PetalWidthCm").add_legend();
+
+plt.figure(figsize=(9,4)) 
+sns.heatmap(iris.corr(),annot=True,cmap='RdPu')
+
+There is no correlation between SepalLengthCm and SepalWidthCm.
+
+SepalLengthCm is higly correlated with PetalWidthCm and PetalLengthCm.
+
+PetalWidthCm is highly correlated with PetalLengthCm.
+
+
+We can distinguish setosa easily but versicolor and virginica is not clear.
+
+# Modeling
+
+y=iris.Species
+X=iris.drop(["Species"],axis=1)
+
+# normalization
+X=(X-np.min(X))/(np.max(X)-np.min(X))
+
+X_sepal=X.loc[:,["SepalLengthCm","SepalWidthCm"]]
+X_petal=X.loc[:,["PetalLengthCm","PetalWidthCm"]]
+
+X_sepaltrain,X_sepaltest,y_sepaltrain,y_sepaltest=train_test_split(X_sepal,y,test_size=0.3,random_state=42)
+X_petaltrain,X_petaltest,y_petaltrain,y_petaltest=train_test_split(X_petal,y,test_size=0.3,random_state=42)
+
+knnsepal= KNeighborsClassifier().fit(X_sepaltest,y_sepaltest)
+knnpetal=KNeighborsClassifier().fit(X_petaltest,y_petaltest)
+print("KNN accuracy for sepal:",knnsepal.score(X_sepaltest,y_sepaltest))
+print("KNN accuracy for petal:",knnpetal.score(X_petaltest,y_petaltest))
+
+# Conclusion
+
+Using Petals over Sepal for training the data gives a much better accuracy.
